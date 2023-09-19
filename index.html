@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Подключение jQuery библиотеки -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Зміна експерта КЦ (іпотека)</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrap">
+        <h1 class="title">Зміна експерта</h1>
+        <!-- Результат -->
+        <div id="result" style="display: none"></div>
+        <!-- Лоадер ожидания -->
+        <div id="loader" style="display: none">Запит в обробці...</div>
+
+        <!-- HTML форма с полями login и ref -->
+        <form id="myForm">
+          <label for="login">Login:</label>
+          <input type="text" id="login" name="login" placeholder="логін експерта" required />
+
+          <label for="ref">Ref:</label>
+          <input type="text" id="ref" name="ref" placeholder="референс заявки" required />
+
+          <input id="uploadButton" type="submit" value="Змінити" />
+        </form>
+      </div>
+    </div>
+    <!-- Скрипт jQuery для отправки формы -->
+    <script>
+      $(document).ready(function () {
+        // При отправке формы
+        $("#myForm").submit(function (event) {
+          event.preventDefault(); // Отменить стандартное поведение формы
+
+          // Получить данные из полей формы
+          var login = $("#login").val();
+          var ref = $("#ref").val();
+
+          // Отобразить лоадер ожидания
+          $("#loader").show();
+
+          $("#uploadButton").click(function () {
+            $("#result").hide();
+       
+
+          })
+
+          // Отправить данные на сервер методом POST
+          $.post(
+            "https://0-1178-0.app.nr.it.loc/login_kc",
+            { login: login.trim(), ref: ref.trim() },
+            function (data, status, xhr) {
+              // Скрыть лоадер ожидания
+              $("#loader").hide();
+              
+
+              // При успешном ответе (статус код 200)
+              if (xhr.status === 200) {
+                // Вывести результат положительно
+                $("#result").text("Результат положительный").show();
+                
+              } else {
+                // Вывести сообщение об ошибке процесса
+                $("#result").text("Ошибка процесса").show();
+              }
+            }
+          );
+        });
+      });
+    </script>
+  </body>
+</html>
