@@ -1,82 +1,226 @@
 <!DOCTYPE html>
 <html lang="uk">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Подключение jQuery библиотеки -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Зміна експерта КЦ (іпотека)</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
-    <title>Зміна експерта КЦ (іпотека)</title>
-  </head>
-  <body>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <style>
+      /* Загальні стилі */
+      :root {
+        --primary-color: #007bff;
+        --primary-hover-color: #0056b3;
+        --success-color: #28a745;
+        --error-color: #dc3545;
+        --background-color: #f4f7f9;
+        --form-background-color: #ffffff;
+        --text-color: #333;
+        --border-color: #ddd;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      body, html {
+        height: 100%;
+        margin: 0;
+        font-family: "Roboto", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Контейнер форми */
+      .container {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+      }
+
+      .wrap {
+        background-color: var(--form-background-color);
+        padding: 30px 40px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        text-align: center;
+      }
+
+      .title {
+        margin-top: 0;
+        margin-bottom: 25px;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      /* Стилі для форми */
+      #myForm label {
+        display: block;
+        text-align: left;
+        font-weight: 500;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      #myForm input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-sizing: border-box; /* Важливо для правильного розрахунку ширини */
+        font-size: 16px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+
+      #myForm input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      }
+
+      #submitButton {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #submitButton:hover {
+        background-color: var(--primary-hover-color);
+      }
+
+      #submitButton:disabled {
+        background-color: #a0caff;
+        cursor: not-allowed;
+      }
+
+      /* Завантажувач (лоадер) */
+      .loader {
+        border: 4px solid #f3f3f3; /* Light grey */
+        border-top: 4px solid var(--primary-color); /* Blue */
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Повідомлення про результат */
+      #result {
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+      }
+      
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    </style>
+</head>
+<body>
     <div class="container">
       <div class="wrap">
         <h1 class="title">Зміна експерта</h1>
-        <!-- Результат -->
+
         <div id="result" style="display: none"></div>
-        <!-- Лоадер ожидания -->
-        <div id="loader" style="display: none">Запит в обробці...</div>
+        
+        <div id="loader" class="loader" style="display: none"></div>
 
-        <!-- HTML форма с полями login и ref -->
         <form id="myForm">
-          <label for="login">Login:</label>
-          <input type="text" id="login" name="login" placeholder="логін експерта" required />
+          <label for="login">Логін експерта:</label>
+          <input type="text" id="login" name="login" placeholder="Введіть логін" required />
 
-          <label for="ref">Ref:</label>
-          <input type="text" id="ref" name="ref" placeholder="референс заявки" required />
+          <label for="ref">Референс заявки:</label>
+          <input type="text" id="ref" name="ref" placeholder="Введіть референс" required />
 
-          <input id="uploadButton" type="submit" value="Змінити" />
+          <input id="submitButton" type="submit" value="Змінити" />
         </form>
       </div>
     </div>
-    <!-- Скрипт jQuery для отправки формы -->
+
     <script>
       $(document).ready(function () {
-        // При отправке формы
+        // Обробка відправки форми
         $("#myForm").submit(function (event) {
-          event.preventDefault(); // Отменить стандартное поведение формы
+          // Запобігти стандартній поведінці форми (перезавантаженню сторінки)
+          event.preventDefault(); 
 
-          // Получить данные из полей формы
-          var login = $("#login").val();
-          var ref = $("#ref").val();
+          // Отримуємо посилання на елементи
+          const resultDiv = $("#result");
+          const loader = $("#loader");
+          const submitButton = $("#submitButton");
+          
+          // Отримуємо дані з полів форми та видаляємо зайві пробіли
+          const login = $("#login").val().trim();
+          const ref = $("#ref").val().trim();
 
-          // Отобразить лоадер ожидания
-          $("#loader").show();
+          // Ховаємо попередній результат і очищуємо класи стилів
+          resultDiv.hide().removeClass("success error");
+          
+          // Показуємо завантажувач та блокуємо кнопку
+          loader.show();
+          submitButton.prop("disabled", true);
 
-          $("#uploadButton").click(function () {
-            $("#result").hide();
-       
-
+          // Відправляємо AJAX-запит на сервер
+          $.ajax({
+            url: "https://0-1178-0.app.nr.it.loc/login_kc",
+            type: "POST",
+            data: { 
+              login: login, 
+              ref: ref 
+            },
+            dataType: "json" // Очікуємо відповідь у форматі JSON
           })
-
-          // Отправить данные на сервер методом POST
-          $.post(
-            "https://0-1178-0.app.nr.it.loc/login_kc",
-            { login: login.trim(), ref: ref.trim() },
-            function (data, status, xhr) {
-              // Скрыть лоадер ожидания
-              $("#loader").hide();
-              
-
-              // При успешном ответе (статус код 200)
-              if (xhr.status === 200) {
-                // Вывести результат положительно
-                $("#result").text("Запит успішно виконано").show();
-                
-              } else {
-                // Вывести сообщение об ошибке процесса
-                $("#result").text("Помилка процесу").show();
-              }
-            }
-          );
+          .done(function(data, textStatus, jqXHR) {
+            // Ця функція виконується при успішному запиті (статус 2xx)
+            console.log("Success:", data);
+            resultDiv.text("Запит успішно виконано!").addClass("success").show();
+          })
+          .fail(function(jqXHR, textStatus, errorThrown) {
+            // Ця функція виконується при помилці (статуси 4xx, 5xx, проблеми з мережею)
+            console.error("Error:", textStatus, errorThrown);
+            // Спробуємо отримати текст помилки від сервера, якщо він є
+            const errorMessage = jqXHR.responseJSON?.message || jqXHR.responseText || "Сталася помилка. Спробуйте пізніше.";
+            resultDiv.text(`Помилка: ${errorMessage}`).addClass("error").show();
+          })
+          .always(function() {
+            // Ця функція виконується завжди, незалежно від результату
+            // Ховаємо завантажувач та розблоковуємо кнопку
+            loader.hide();
+            submitButton.prop("disabled", false);
+          });
         });
       });
     </script>
-  </body>
+</body>
 </html>
